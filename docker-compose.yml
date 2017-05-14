@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  zookeeper:
+    image: jplock/zookeeper
+    networks:       
+      - sw_network
+    ports:
+      - 2181:2181
+
+  wallet:
+    image: registry.app/nas/wallet:latest
+    networks:       
+      - sw_network
+    deploy:
+      replicas: 2
+        
+networks:
+  sw_network:
+    external:
+      name: casino_dev2
+
