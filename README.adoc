@@ -1,5 +1,13 @@
 = Akka Cluster in Docker Swarm
 
+== Run Cluster
+
+    $ docker-compose up -d
+
 == Inspect Cluster stater 
 
     $ docker run --network casino_dev2 --rm bwits/docker-httpie GET 10.0.0.3:8778/jolokia/read/akka:type=Cluster/ClusterStatus | jq '.value | fromjson'
+
+== Run REST interface ro cluster
+
+    $ docker run -d -p 9090:9090 registry.app/nas/wallet_rest
