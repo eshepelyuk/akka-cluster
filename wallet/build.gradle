@@ -26,12 +26,11 @@ dependencies {
 }
 
 applicationDefaultJvmArgs = [
-        '-javaagent:$APP_HOME/lib/jolokia-jvm-1.3.6-agent.jar=host=0.0.0.0',
-        '-DDOCKER_CONTAINER_IP=$(hostname -i)'
+        '-javaagent:$APP_HOME/lib/jolokia-jvm-1.3.6-agent.jar=host=0.0.0.0'
 ]
 
 startScripts {
     doLast {
-        unixScript.text = unixScript.text.replace('\\$APP_HOME', '\$APP_HOME').replace('\\$(hostname', '\$(hostname')
+        unixScript.text = unixScript.text.replace('\\$APP_HOME', '\$APP_HOME')
     }
 }
