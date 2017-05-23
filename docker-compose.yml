@@ -15,6 +15,13 @@ services:
     deploy:
       replicas: 2
         
+  wallet_rest:
+    image: registry.app/nas/wallet_rest:latest
+    networks:       
+      - sw_network
+    deploy:
+      replicas: 1
+
 networks:
   sw_network:
     external:

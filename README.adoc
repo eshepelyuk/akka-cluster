@@ -2,12 +2,14 @@
 
 == Run Cluster
 
-    $ docker-compose up -d
+    $ docker stack deploy -c docker-compose.yml akka
 
 == Inspect Cluster state
 
-    $ docker run --network casino_dev2 --rm bwits/docker-httpie GET 10.0.0.3:8778/jolokia/read/akka:type=Cluster/ClusterStatus | jq '.value | fromjson'
+    $ docker run --network casino_dev2 --rm alpine/httpie GET wallet:8778/jolokia/read/akka:type=Cluster/ClusterStatus | jq '.value | fromjson'
 
-== Run REST interface ro cluster
+== Test
 
-    $ docker run -d -p 9090:9090 registry.app/nas/wallet_rest
+    $ docker run --network casino_dev2 --rm alpine/httpie GET wallet_rest:9090/hello_proxy/qwe 
+    
+    $ docker run --network casino_dev2 --rm alpine/httpie GET wallet_rest:9090/hello_client/qwe 

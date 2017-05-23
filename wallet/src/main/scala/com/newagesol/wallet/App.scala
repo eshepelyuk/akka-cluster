@@ -1,6 +1,9 @@
 package com.newagesol.wallet
 
+import java.net.InetAddress
+
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
+import akka.cluster.client.ClusterClientReceptionist
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
 import akka.event.LoggingReceive
 import akka.http.scaladsl.Http
@@ -15,14 +18,14 @@ class Wallet extends Actor with ActorLogging {
   def receive = LoggingReceive {
     case message: String =>
       sender ! s"Reply to $message from HOSTNAME=${System.getenv("HOSTNAME")}, " +
-        s"DOCKER_CONTAINER_IP=${System.getProperty("DOCKER_CONTAINER_IP")}, " +
-        s"name=${self.path.name}"
+        s"CONTAINER_IP=${InetAddress.getLocalHost.getHostAddress}, " +
+        s"name=${self.path}"
   }
 }
 
 object Wallet {
   val extractShardId: ShardRegion.ExtractShardId = {
-    case s: String => s"${s.substring(0, 2).hashCode % 2}"
+    case s: String => s"${s.substring(0, 2).hashCode % 20}"
   }
 
   val extractEntityId: ShardRegion.ExtractEntityId = {
@@ -37,7 +40,10 @@ object App extends App {
 
   ConstructrExtension(actorSystem)
 
-  ClusterSharding(actorSystem).start("wallet", Props(classOf[Wallet]), ClusterShardingSettings(actorSystem), extractEntityId, extractShardId)
+  val walletShard = ClusterSharding(actorSystem).start("wallet", Props(classOf[Wallet]),
+    ClusterShardingSettings(actorSystem), extractEntityId, extractShardId)
+
+  ClusterClientReceptionist(actorSystem).registerService(walletShard)
 
   val healthRoute =
     path("health") {
