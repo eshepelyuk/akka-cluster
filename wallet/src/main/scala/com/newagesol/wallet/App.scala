@@ -6,8 +6,6 @@ import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import akka.cluster.client.ClusterClientReceptionist
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
 import akka.event.LoggingReceive
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.newagesol.wallet.Wallet.{extractEntityId, extractShardId}
 import de.heikoseeberger.constructr.ConstructrExtension
@@ -34,9 +32,9 @@ object Wallet {
 }
 
 object App extends App {
-  implicit val actorSystem = ActorSystem("WalletActorSystem")
+  implicit val actorSystem: ActorSystem = ActorSystem("WalletActorSystem")
   implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
-  implicit val materializer = ActorMaterializer()
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   ConstructrExtension(actorSystem)
 
@@ -44,13 +42,4 @@ object App extends App {
     ClusterShardingSettings(actorSystem), extractEntityId, extractShardId)
 
   ClusterClientReceptionist(actorSystem).registerService(walletShard)
-
-  val healthRoute =
-    path("health") {
-      get {
-        complete("OK")
-      }
-    }
-
-  Http().bindAndHandle(healthRoute, "0.0.0.0", 9090)
 }

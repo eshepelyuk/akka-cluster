@@ -1,3 +1,0 @@
-spring.application.name: wallet_rest
-server.port: 9090
-security.basic.enabled: false

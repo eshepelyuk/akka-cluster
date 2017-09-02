@@ -1,4 +1,4 @@
-version: "3"
+version: "3.2"
 
 services:
   zookeeper:
@@ -9,14 +9,14 @@ services:
       - 2181:2181
 
   wallet:
-    image: registry.app/nas/wallet:latest
+    image: hrzn/wallet:latest
     networks:       
       - sw_network
     deploy:
       replicas: 2
         
   wallet_rest:
-    image: registry.app/nas/wallet_rest:latest
+    image: hrzn/wallet_rest:latest
     networks:       
       - sw_network
     deploy:
@@ -25,5 +25,5 @@ services:
 networks:
   sw_network:
     external:
-      name: casino_dev2
+      name: akka_cluster
 

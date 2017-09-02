@@ -7,6 +7,7 @@
 == Inspect Cluster state
 
     $ docker run --network casino_dev2 --rm alpine/httpie GET wallet:8778/jolokia/read/akka:type=Cluster/ClusterStatus | jq '.value | fromjson'
+    $ docker run -it --network casino_dev2 --rm jolokia/jmx4perl j4psh http://wallet:8778/jolokia
 
 == Test
 

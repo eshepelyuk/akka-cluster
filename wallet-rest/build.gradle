@@ -1,24 +1,36 @@
-buildscript {
-    repositories {
-        maven { url "https://plugins.gradle.org/m2/" }
-        maven { url 'http://artifactory.app/nas-artifacts' }
-    }
-    dependencies {
-        classpath('com.newagesol:gradle:0.11-SNAPSHOT') { changing = true }
-    }
-    configurations.classpath {
-        resolutionStrategy.cacheChangingModulesFor 4, 'hours'
-    }
+plugins {
+    id 'scala'
+    id 'application'
+    id 'com.bmuschko.docker-java-application' version "3.1.0"
 }
-
-apply plugin: 'com.newagesol.gradle.akka'
-apply plugin: 'com.newagesol.gradle.docker'
-apply plugin: 'com.newagesol.gradle.springboot'
 
 dependencies {
     compile group: 'de.heikoseeberger', name: 'constructr_2.11', version: '0.17.0'
     compile group: 'com.lightbend.constructr', name: 'constructr-coordination-zookeeper_2.11', version: '0.3.5'
-    compile "com.typesafe.akka:akka-cluster-tools_$scalaAkkaVersion:2.4.17"
-    compile "com.typesafe.akka:akka-cluster-sharding_$scalaAkkaVersion:2.4.17"
-    compile group: 'com.typesafe.akka', name: 'akka-distributed-data-experimental_2.11', version: '2.4.17'
+
+    compile 'com.typesafe.akka:akka-slf4j_2.11:2.5.4'
+    compile 'com.typesafe.akka:akka-cluster-tools_2.11:2.5.4'
+    compile 'com.typesafe.akka:akka-cluster-sharding_2.11:2.5.4'
+    compile 'com.typesafe.akka:akka-distributed-data_2.11:2.5.4'
+    compile "com.typesafe.akka:akka-http_2.11:10.0.9"
+
+    runtime 'ch.qos.logback:logback-classic:1.2.3'
+}
+
+mainClassName = 'com.newagesol.wallet_rest.App'
+
+docker {
+
+    System.getenv("DOCKER_HOST")?.with {
+        url = it
+    }
+    System.getenv('DOCKER_CERT_PATH')?.with {
+        certPath = new File(it)
+    }
+
+    javaApplication {
+        baseImage = 'anapsix/alpine-java:8'
+        ports = [9090]
+        tag = 'hrzn/wallet_rest'
+    }
 }
