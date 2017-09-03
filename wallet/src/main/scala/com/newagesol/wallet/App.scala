@@ -41,5 +41,6 @@ object App extends App {
   val walletShard = ClusterSharding(actorSystem).start("wallet", Props(classOf[Wallet]),
     ClusterShardingSettings(actorSystem), extractEntityId, extractShardId)
 
+  print(s"@@@@ ${walletShard.path}")
   ClusterClientReceptionist(actorSystem).registerService(walletShard)
 }

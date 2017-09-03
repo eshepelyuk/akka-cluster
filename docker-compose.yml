@@ -10,13 +10,20 @@ services:
 
   wallet:
     image: hrzn/wallet:latest
+    depends_on:
+      - zookeeper
     networks:       
       - sw_network
     deploy:
-      replicas: 2
+      replicas: 1
         
   wallet_rest:
     image: hrzn/wallet_rest:latest
+    depends_on:
+      - zookeeper
+      - wallet
+    ports:
+      - 9090:9090
     networks:       
       - sw_network
     deploy:
