@@ -15,7 +15,7 @@ services:
     networks:       
       - sw_network
     deploy:
-      replicas: 2
+      replicas: 3
         
   wallet_rest:
     image: hrzn/wallet_rest:latest
@@ -33,4 +33,3 @@ networks:
   sw_network:
     external:
       name: akka_cluster
-
