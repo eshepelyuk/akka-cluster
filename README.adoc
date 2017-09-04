@@ -14,6 +14,6 @@
 
 == Test node interaction
 
-    $ docker run --network akka_cluster --rm alpine/httpie GET wallet_rest:9090/hello_proxy/qwe 
+    $ docker run --network akka_cluster --rm alpine/httpie GET wallet_rest:9090/hello_shard/qwe 
     
     $ docker run --network akka_cluster --rm alpine/httpie GET wallet_rest:9090/hello_client/qwe 
