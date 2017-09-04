@@ -5,7 +5,7 @@ import java.net.InetAddress
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import akka.cluster.client.ClusterClientReceptionist
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
-import akka.event.LoggingReceive
+import akka.event.{Logging, LoggingReceive}
 import akka.stream.ActorMaterializer
 import com.newagesol.wallet.Wallet.{extractEntityId, extractShardId}
 import de.heikoseeberger.constructr.ConstructrExtension
@@ -41,6 +41,6 @@ object App extends App {
   val walletShard = ClusterSharding(actorSystem).start("wallet", Props(classOf[Wallet]),
     ClusterShardingSettings(actorSystem), extractEntityId, extractShardId)
 
-  print(s"@@@@ ${walletShard.path}")
+  Logging(actorSystem, this.getClass).info(s"@@@@ ${walletShard.path}")
   ClusterClientReceptionist(actorSystem).registerService(walletShard)
 }

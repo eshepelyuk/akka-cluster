@@ -15,7 +15,7 @@ services:
     networks:       
       - sw_network
     deploy:
-      replicas: 1
+      replicas: 2
         
   wallet_rest:
     image: hrzn/wallet_rest:latest
