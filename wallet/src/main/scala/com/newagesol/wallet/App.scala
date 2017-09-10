@@ -21,6 +21,15 @@ class Wallet extends Actor with ActorLogging {
   }
 }
 
+class SomeActor extends Actor with ActorLogging {
+  def receive = LoggingReceive {
+    case message: String =>
+      sender ! s"Reply to $message from HOSTNAME=${System.getenv("HOSTNAME")}, " +
+        s"CONTAINER_IP=${InetAddress.getLocalHost.getHostAddress}, " +
+        s"name=${self.path}"
+  }
+}
+
 object Wallet {
   val extractShardId: ShardRegion.ExtractShardId = {
     case s: String => s"${s.substring(0, 2).hashCode % 20}"
@@ -42,4 +51,6 @@ object App extends App {
     ClusterShardingSettings(actorSystem), extractEntityId, extractShardId)
 
   ClusterClientReceptionist(actorSystem).registerService(walletShard)
+
+  actorSystem.actorOf(Props(classOf[SomeActor]), "someActor")
 }
