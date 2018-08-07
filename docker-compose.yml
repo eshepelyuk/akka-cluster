@@ -1,34 +1,23 @@
-version: "3.2"
+version: "3.4"
 
 services:
-  zookeeper:
-    image: jplock/zookeeper
-    networks:       
-      - sw_network
-    ports:
-      - 2181:2181
 
   wallet:
-    image: hrzn/wallet:latest
-    depends_on:
-      - zookeeper
+    image: eshepelyuk/wallet:latest
     networks:       
       - sw_network
     deploy:
-      replicas: 3
+      replicas: 2
         
   wallet_rest:
-    image: hrzn/wallet_rest:latest
-    depends_on:
-      - zookeeper
-      - wallet
+    image: eshepelyuk/wallet_rest:latest
     ports:
       - 9090:9090
     networks:       
       - sw_network
     deploy:
       replicas: 1
-
+      
 networks:
   sw_network:
     external:

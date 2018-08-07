@@ -3,25 +3,15 @@ package com.newagesol.wallet
 import java.net.InetAddress
 
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
-import akka.cluster.client.ClusterClientReceptionist
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
 import akka.event.LoggingReceive
+import akka.management.AkkaManagement
 import akka.stream.ActorMaterializer
 import com.newagesol.wallet.Wallet.{extractEntityId, extractShardId}
-import de.heikoseeberger.constructr.ConstructrExtension
 
 import scala.concurrent.ExecutionContextExecutor
 
 class Wallet extends Actor with ActorLogging {
-  def receive = LoggingReceive {
-    case message: String =>
-      sender ! s"Reply to $message from HOSTNAME=${System.getenv("HOSTNAME")}, " +
-        s"CONTAINER_IP=${InetAddress.getLocalHost.getHostAddress}, " +
-        s"name=${self.path}"
-  }
-}
-
-class SomeActor extends Actor with ActorLogging {
   def receive = LoggingReceive {
     case message: String =>
       sender ! s"Reply to $message from HOSTNAME=${System.getenv("HOSTNAME")}, " +
@@ -41,16 +31,12 @@ object Wallet {
 }
 
 object App extends App {
-  implicit val actorSystem: ActorSystem = ActorSystem("WalletActorSystem")
-  implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  implicit val system: ActorSystem = ActorSystem("WalletActorSystem")
+  implicit val executionContext: ExecutionContextExecutor = system.dispatcher
+  implicit val ctx: ActorMaterializer = ActorMaterializer()
 
-  ConstructrExtension(actorSystem)
+  AkkaManagement(system).start()
 
-  val walletShard = ClusterSharding(actorSystem).start("wallet", Props(classOf[Wallet]),
-    ClusterShardingSettings(actorSystem), extractEntityId, extractShardId)
-
-  ClusterClientReceptionist(actorSystem).registerService(walletShard)
-
-  actorSystem.actorOf(Props(classOf[SomeActor]), "someActor")
+  ClusterSharding(system).start("wallet", Props(classOf[Wallet]),
+    ClusterShardingSettings(system), extractEntityId, extractShardId)
 }
