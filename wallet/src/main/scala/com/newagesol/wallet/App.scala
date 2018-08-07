@@ -6,6 +6,7 @@ import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
 import akka.event.LoggingReceive
 import akka.management.AkkaManagement
+import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.stream.ActorMaterializer
 import com.newagesol.wallet.Wallet.{extractEntityId, extractShardId}
 import org.slf4j.LoggerFactory
@@ -42,6 +43,7 @@ object App extends App {
   AkkaManagement(system).start().onComplete {
     case Success(url) =>
       log.info(s"akka mgmt started @ $url")
+      ClusterBootstrap(system).start()
       ClusterSharding(system).start("wallet", Props(classOf[Wallet]),
         ClusterShardingSettings(system), extractEntityId, extractShardId)
     case Failure(ex) =>

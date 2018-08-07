@@ -6,6 +6,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.StatusCodes.InternalServerError
 import akka.http.scaladsl.server.Directives._
 import akka.management.AkkaManagement
+import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.pattern.ask
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
@@ -36,6 +37,8 @@ object App extends App {
   AkkaManagement(system).start().onComplete {
     case Success(url) =>
       log.info(s"akka mgmt started @ $url")
+      ClusterBootstrap(system).start()
+
       val shardProxy = ClusterSharding(system)
         .startProxy("wallet", None, Wallet.extractEntityId, Wallet.extractShardId)
 
