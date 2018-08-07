@@ -9,7 +9,7 @@ appender("STDOUT", ConsoleAppender) {
 }
 
 logger("com.newagesol", DEBUG)
-logger("org.apache.zookeeper", WARN)
-logger("akka.cluster.sharding", DEBUG)
-logger("akka.cluster.ddata", DEBUG)
+//logger("akka.cluster.sharding", DEBUG)
+//logger("akka.cluster.ddata", DEBUG)
+logger("akka", DEBUG)
 root(INFO, ["STDOUT"])

@@ -1,7 +1,6 @@
 package com.newagesol.wallet_rest
 
-import akka.actor.{ActorPath, ActorSystem, RootActorPath}
-import akka.cluster.client.{ClusterClient, ClusterClientSettings}
+import akka.actor.ActorSystem
 import akka.cluster.sharding.{ClusterSharding, ShardRegion}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.StatusCodes.InternalServerError
@@ -10,8 +9,8 @@ import akka.management.AkkaManagement
 import akka.pattern.ask
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
+import org.slf4j.LoggerFactory
 
-import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.util.{Failure, Success}
 
@@ -32,20 +31,28 @@ object App extends App {
   implicit val executionContext = system.dispatcher
   implicit val timeout = Timeout(15.seconds)
 
-  AkkaManagement(system).start()
+  val log = LoggerFactory.getLogger(this.getClass)
 
-  val shardProxy = ClusterSharding(system)
-    .startProxy("wallet", None, Wallet.extractEntityId, Wallet.extractShardId)
+  AkkaManagement(system).start().onComplete {
+    case Success(url) =>
+      log.info(s"akka mgmt started @ $url")
+      val shardProxy = ClusterSharding(system)
+        .startProxy("wallet", None, Wallet.extractEntityId, Wallet.extractShardId)
 
-  val route =
-    path("hello_shard" / Remaining) { w =>
-      get {
-        onComplete(shardProxy ? w) {
-          case Success(x) => complete(s"$x")
-          case Failure(ex) => complete(InternalServerError, s"${ex.getMessage}")
+      val route =
+        path("hello_shard" / Remaining) { w =>
+          get {
+            onComplete(shardProxy ? w) {
+              case Success(x) => complete(s"$x")
+              case Failure(ex) => complete(InternalServerError, s"${ex.getMessage}")
+            }
+          }
         }
-      }
-    }
 
-  val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 9090)
+      val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 9090)
+
+    case Failure(ex) =>
+      log.error("akka mgmt failed to start", ex)
+  }
+
 }

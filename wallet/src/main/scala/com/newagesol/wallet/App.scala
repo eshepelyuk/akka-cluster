@@ -8,8 +8,10 @@ import akka.event.LoggingReceive
 import akka.management.AkkaManagement
 import akka.stream.ActorMaterializer
 import com.newagesol.wallet.Wallet.{extractEntityId, extractShardId}
+import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContextExecutor
+import scala.util.{Failure, Success}
 
 class Wallet extends Actor with ActorLogging {
   def receive = LoggingReceive {
@@ -33,10 +35,17 @@ object Wallet {
 object App extends App {
   implicit val system: ActorSystem = ActorSystem("WalletActorSystem")
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
-  implicit val ctx: ActorMaterializer = ActorMaterializer()
+  implicit val mat: ActorMaterializer = ActorMaterializer()
 
-  AkkaManagement(system).start()
+  val log = LoggerFactory.getLogger(this.getClass)
 
-  ClusterSharding(system).start("wallet", Props(classOf[Wallet]),
-    ClusterShardingSettings(system), extractEntityId, extractShardId)
+  AkkaManagement(system).start().onComplete {
+    case Success(url) =>
+      log.info(s"akka mgmt started @ $url")
+      ClusterSharding(system).start("wallet", Props(classOf[Wallet]),
+        ClusterShardingSettings(system), extractEntityId, extractShardId)
+    case Failure(ex) =>
+      log.error("akka mgmt failed to start", ex)
+  }
+
 }
