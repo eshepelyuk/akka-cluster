@@ -9,7 +9,8 @@ appender("STDOUT", ConsoleAppender) {
 }
 
 logger("com.newagesol", DEBUG)
-//logger("akka.cluster.sharding", DEBUG)
-//logger("akka.cluster.ddata", DEBUG)
+logger("akka.cluster", INFO)
+logger("akka.serialization", INFO)
+logger("akka.remote.EndpointWriter", INFO)
 logger("akka", DEBUG)
 root(INFO, ["STDOUT"])

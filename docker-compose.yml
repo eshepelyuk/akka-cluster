@@ -9,14 +9,14 @@ services:
     deploy:
       replicas: 2
         
-  wallet_rest:
-    image: eshepelyuk/wallet_rest:latest
-    ports:
-      - 9090:9090
-    networks:       
-      - sw_network
-    deploy:
-      replicas: 1
+#  wallet_rest:
+#    image: eshepelyuk/wallet_rest:latest
+#    ports:
+#      - 9090:9090
+#    networks:
+#      - sw_network
+#    deploy:
+#      replicas: 1
       
 networks:
   sw_network:
